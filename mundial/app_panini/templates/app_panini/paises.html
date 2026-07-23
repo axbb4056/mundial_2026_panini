@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #e8f4fd 0%, #c6e2ff 100%);
+            min-height: 100vh;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #0066cc;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header .emoji {
+            font-size: 1.5em;
+        }
+        
+        .countries-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .country-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 2px solid #f0f0f0;
+        }
+        
+        .country-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+        }
+        
+        .country-link {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .country-link:hover {
+            color: inherit;
+        }
+        
+        .country-card:hover .country-name {
+            color: #0066cc;
+        }
+        
+        .country-flag {
+            width: 80px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin: 0 auto 15px;
+            display: block;
+            border: 2px solid #ddd;
+            background: #f5f5f5;
+        }
+        
+        .country-flag.placeholder {
+            width: 80px;
+            height: 60px;
+            background: #f0f0f0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            color: #666;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        
+        .country-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+        
+        .country-code {
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+            background: #f8f9fa;
+            padding: 4px 8px;
+            border-radius: 12px;
+            display: inline-block;
+            margin: 0 auto;
+        }
+        
+        .team-info {
+            margin-top: 12px;
+            text-align: center;
+        }
+        
+        .team-group {
+            background: #0066cc;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+        
+        .confederation {
+            color: #888;
+            font-size: 0.8em;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1><span class="emoji">⚽</span> {{ title }} <span class="emoji">🏆</span></h1>
+    </div>
+    
+    <div style="text-align: center; margin-bottom: 30px;">
+        <a href="{% url 'app_panini:countries' %}" style="color: #0066cc; text-decoration: none; margin: 0 15px; padding: 8px 16px; border: 2px solid #0066cc; border-radius: 20px;">Países</a>
+        <a href="{% url 'app_panini:players' %}" style="color: #0066cc; text-decoration: none; margin: 0 15px; padding: 8px 16px; border: 2px solid #0066cc; border-radius: 20px;">Jugadores</a>
+    </div>
+    
+    <div class="countries-grid">
+        {% for country in countries %}
+        <div class="country-card">
+            <a href="{% url 'app_panini:country_players' country.code %}" class="country-link">
+                {% if country.flag_image %}
+                    <img src="{{ country.flag_image.url }}" 
+                         alt="{{ country.name }} flag" 
+                         class="country-flag"
+                         loading="lazy">
+                {% else %}
+                    <div class="country-flag placeholder">
+                        {{ country.code }}
+                    </div>
+                {% endif %}
+                <div class="country-name">{{ country.name }}</div>
+                <div class="country-code">{{ country.code }}</div>
+                
+                {% if country.team %}
+                <div class="team-info">
+                    <div class="team-group">Group {{ country.team.group }}</div>
+                </div>
+                {% endif %}
+                
+                <div class="confederation">{{ country.get_confederation_display }}</div>
+            </a>
+        </div>
+        {% empty %}
+        <div style="grid-column: 1 / -1; text-align: center; color: #666; font-size: 1.2em;">
+            No countries loaded yet. Run migrations and load data.
+        </div>
+        {% endfor %}
+    </div>
+</body>
+<script>
+// Asegurar que los clicks en las tarjetas funcionen
+document.addEventListener('DOMContentLoaded', function() {
+    const countryCards = document.querySelectorAll('.country-card');
+    
+    countryCards.forEach(card => {
+        card.addEventListener('click', function(e) {
+            const link = this.querySelector('.country-link');
+            if (link && e.target.tagName !== 'A') {
+                window.location.href = link.href;
+            }
+        });
+    });
+});
+</script>
+</html>

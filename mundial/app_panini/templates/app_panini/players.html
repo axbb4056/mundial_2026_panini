@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #e8f4fd 0%, #c6e2ff 100%);
+            min-height: 100vh;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #0066cc;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .nav-links {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .nav-links a {
+            color: #0066cc;
+            text-decoration: none;
+            margin: 0 15px;
+            padding: 8px 16px;
+            border: 2px solid #0066cc;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            background: #0066cc;
+            color: white;
+        }
+        
+        .players-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .player-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 2px solid #f0f0f0;
+        }
+        
+        .player-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+        }
+        
+        .player-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: block;
+            border: 3px solid #0066cc;
+            background: #f5f5f5;
+        }
+        
+        .player-image.placeholder {
+            width: 80px;
+            height: 80px;
+            background: #f0f0f0;
+            border: 3px solid #ddd;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            color: #666;
+            font-weight: bold;
+            font-size: 24px;
+        }
+        
+        .player-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+        
+        .player-info {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .jersey-number {
+            background: #0066cc;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        
+        .position {
+            background: #f8f9fa;
+            padding: 4px 8px;
+            border-radius: 12px;
+            color: #666;
+        }
+        
+        .team-info {
+            text-align: center;
+            color: #888;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1><span class="emoji">⚽</span> {{ title }} <span class="emoji">🏆</span></h1>
+    </div>
+    
+    <div class="nav-links">
+        <a href="{% url 'app_panini:countries' %}">Países</a>
+        <a href="{% url 'app_panini:players' %}">Jugadores</a>
+    </div>
+    
+    <div class="players-grid">
+        {% for player in players %}
+        <div class="player-card">
+            {% if player.player_image %}
+                <img src="{{ player.player_image.url }}" 
+                     alt="{{ player.name }}" 
+                     class="player-image"
+                     loading="lazy">
+            {% else %}
+                <div class="player-image placeholder">
+                    {{ player.jersey_number }}
+                </div>
+            {% endif %}
+            
+            <div class="player-name">{{ player.name }}</div>
+            
+            <div class="player-info">
+                <span class="jersey-number">#{{ player.jersey_number }}</span>
+                <span class="position">{{ player.get_position_display }}</span>
+            </div>
+            
+            <div class="team-info">
+                {{ player.team.name }}
+                {% if player.age %} | {{ player.age }} años{% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <div style="grid-column: 1 / -1; text-align: center; color: #666; font-size: 1.2em;">
+            No hay jugadores cargados. Agrega jugadores desde el admin.
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
